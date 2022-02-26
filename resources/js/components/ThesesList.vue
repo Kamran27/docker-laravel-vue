@@ -1,0 +1,89 @@
+<template>
+ <v-card>
+   <v-card-title>
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        label="Search"
+        single-line
+        hide-details
+      ></v-text-field>
+   </v-card-title>
+    <v-data-table
+      :headers="thesisHeaders"
+      :items="theses"
+      :search="search"
+      item-key="titel"
+      class="elevation-1"
+    >
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-toolbar-title>Abschlussarbeiten</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-switch
+            v-model="singleExpand"
+            label="Single expand"
+            class="mt-2"
+          ></v-switch>
+        </v-toolbar>
+      </template>
+      <template v-slot:item.actions="{ item }">
+        <v-btn depressed 
+        color="primary" @click="$router.push({ name: '/get_thesis', params: {id:item.id} })">
+        Mehr
+        </v-btn>
+      </template>
+  </v-data-table> 
+ </v-card>
+</template>
+
+
+<script>
+  export default {
+    name: "ThesesList",
+     data () {
+      return {
+        expanded: [],
+        singleExpand: false,
+        search: '',
+
+        //url: document.head.querySelector('meta[name="url"]').content,
+        //theses: [],
+
+        thesisHeaders: [
+          { text: 'TITEL', value: 'titel' },
+          { text: 'HERAUSGEBER', value: 'publisher' },
+          { text: 'TECHNOLOGIE', value: 'proglang' },
+          { text: 'DETAIL', value: 'actions', sortable: false },
+        ],  
+      }
+    },
+    computed: {
+      theses() {
+        return this.$store.state.theses
+      }
+    },
+    mounted() {
+      this.$store.dispatch('loadData');
+    },
+    created() {
+      //this.loadData();
+    },
+    methods: {
+      /* loadData() {
+        let url = this.url + '/api/getTheses';
+        this.axios.get(url).then(response => {
+          this.theses = response.data;
+        })
+      },
+      mounted() {
+        console.log('ThesesList Komponente');
+      }, */
+      clicked(value) {
+        this.expanded.push(value)      
+      },
+    },
+
+  }
+</script>
