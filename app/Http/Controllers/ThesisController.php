@@ -2,51 +2,76 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ThesisResource as ThesesResource;
 use App\Models\Thesis;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use App\Http\Requests\ThesesRequest;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Redis;
+
+
 
 class ThesisController extends Controller
 {
+    // Alle Theses anzeigen
+    public function index() {
+        return ThesesResource::collection(Thesis::all());
+        //return Thesis::all();
+    }
+
+    // Einzige Thesis anzeigen
+    public function show($id) {
+        $thesis = Thesis::find($id);
+        return new ThesesResource($thesis);
+        //return Thesis::find($id);
+    }
+    //Thesis speichern
+    public function store(ThesesRequest $request) {
+        $thesis = Thesis::create($request->all());
+        return new ThesesResource($thesis);
+    }
+    //Thesis ändern
+    public function update(ThesesRequest $request, $id) {
+        $thesis = Thesis::find($id);
+        $thesis->update($request->all());
+        return new ThesesResource($thesis);
+    }
+    //Thesis löschen
+    public function destroy($id) {
+        Thesis::destroy($id);
+        return response(null, 204);
+    }
+
+    //Thesis nach Titel suchen
+    public function search($title) {
+        return Thesis::where('title', 'like', '%'.$title.'%')->get();
+    }
+
+    /* 
     public function getTheses() {
         $theses = Thesis::all();
-        $thesisTag = Thesis::find(1);
+       $thesisTag = Thesis::find(1);
 
         foreach ($thesisTag->tags as $tag) {
             $theses->$tag;
-        }
+        } 
         return $theses;
     }
+*/
 
-    public function getTags() {
-        $tags = Tag::all();
-        return $tags;
-    }
-
+    /*
     public function get_thesis($id) {
         $thesis = Thesis::find($id);
-       return response()->json($thesis);
+        return response()->json($thesis);
     }
-
+*/
+/*
     public function saveTheses(Request $request) {
         $thesis = new Thesis;
 
-        $thesisTag = Thesis::find(1);
 
-        foreach ($thesisTag->tags as $tag) {
-            $thesis->$tag;
-        }
-
-        // Validate (size is in KB)
-         /* $request->validate([
-            'image' => 'required|file|image|size:1024|dimensions:max_width=500,max_height=500',
-        ]);  */
-
-        //$newPath = $request->image->store('image', 'public');
-
-        //$contents = file_get_contents($request->image->$newPath());
-
-         if($request->has('image') && !empty($request->image)) {
+        if($request->has('image') && !empty($request->image)) {
             $imageName = time() . '.' . $request->image->getClientOriginalExtension();
             $request->image->move(public_path('images/'),$imageName);
             $path = ('public/images/'.$imageName);
@@ -54,7 +79,7 @@ class ThesisController extends Controller
             $thesis->image = $path;
         }  
 
-        $thesis->titel     = $request->titel;
+        $thesis->title     = $request->title;
         $thesis->publisher = $request->publisher;
         $thesis->proglang  = $request->proglang;
         $thesis->description  = $request->description;
@@ -65,18 +90,10 @@ class ThesisController extends Controller
             return response()->json(['status' => false, 'message' => 'There is some trouble']);
         }
     }
-
-    public function updateTheses(Request $request, $id) {
+*/
+    /* public function updateTheses(Request $request, $id) {
         $thesis = Thesis::where('id', $id)->first();
 
-        // Validate (size is in KB)
-         /* $request->validate([
-            'image' => 'required|file|image|size:1024|dimensions:max_width=500,max_height=500',
-        ]);  */
-
-        //$newPath = $request->image->store('image', 'public');
-
-        //$contents = file_get_contents($request->image->$newPath());
 
          if($request->has('image') && !empty($request->image)) {
             $imageName = time() . '.' . $request->image->getClientOriginalExtension();
@@ -105,5 +122,5 @@ class ThesisController extends Controller
         } else {
             return response()->json(['status' => false, 'message' => 'There is some trouble']);
         }
-    }
+    } */
 }
