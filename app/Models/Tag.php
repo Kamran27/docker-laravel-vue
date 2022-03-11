@@ -10,8 +10,16 @@ class Tag extends Model
     use HasFactory;
     protected $fillable = ['name'];
 
-    public function posts()
+    public function thesis()
     {
-        return $this->morphedByMany(Thesis::class, 'thesis_tag');
+        //return $this->morphedByMany(Thesis::class, 'tag_thesis');
+        return $this->hasManyThrough(
+            'App\Models\Thesis',
+            'App\Models\ThesisTag',
+            'tag_id',
+            'id',
+            'id',
+            'thesis_id'
+        );
     }   
 }

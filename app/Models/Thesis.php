@@ -9,10 +9,32 @@ class Thesis extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'publisher', 'proglang', 'description', 'image', 'file_path' ];
+    protected $fillable = [
+        'title',
+        'publisher',
+        'proglang',
+        'description', 
+        'image',
+        'file_path' 
+    ];
+
+    protected $hidden = [
+        'laravel_through_key',
+        'updated_at',
+        'created_at',
+    ];
+
+
     
-    public function tags()
+    public function tag()
     {
-        return $this->morphToMany(Tag::class, 'thesis_tag');
+        return $this->hasManyThrough(
+            'App\Models\Tag',
+            'App\Models\ThesisTag',
+            'thesis_id',
+            'id',
+            'id',
+            'tag_id'
+        );
     }    
 }
