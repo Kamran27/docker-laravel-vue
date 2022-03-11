@@ -13,12 +13,18 @@ class ThesisTag extends Migration
      */
     public function up()
     {
-        //
-        Schema::create('thesis_tag', function (Blueprint $table) {
-            $table->integer('thesis_id')->unsigned()->nullable();
-            $table->foreign('thesis_id')->references('id')->on('theses')->onDelete('cascade');
-            $table->integer('tag_id')->unsigned()->nullable();
-            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
+        
+        Schema::create('tag_thesis', function (Blueprint $table) {
+            $table->unsignedBigInteger('thesis_id');
+            $table->foreign('thesis_id')
+                ->references('id')
+                ->on('theses')
+                ->cascadeOnDelete();
+            $table->unsignedBigInteger('tag_id');
+            $table->foreign('tag_id')
+                ->references('id')
+                ->on('tags')
+                ->cascadeOnDelete();
         });
     }
 
@@ -30,6 +36,6 @@ class ThesisTag extends Migration
     public function down()
     {
         //
-        Schema::dropIfExists('thesis_tag');
+        Schema::dropIfExists('tag_thesis');
     }
 }

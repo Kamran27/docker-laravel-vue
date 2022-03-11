@@ -14,8 +14,8 @@ class CreateThesesTable extends Migration
     public function up()
     {
         Schema::create('theses', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('titel')->nullable();
+            $table->id();
+            $table->string('title')->nullable();
             $table->string('publisher')->nullable();
             $table->string('proglang')->nullable();
             $table->string('description')->nullable();
