@@ -10,8 +10,6 @@ use App\Http\Requests\ThesesRequest;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Redis;
 
-
-
 class ThesisController extends Controller
 {
     // Alle Theses anzeigen
@@ -19,7 +17,6 @@ class ThesisController extends Controller
         return ThesesResource::collection(Thesis::all());
         //return Thesis::all();
     }
-
     // Einzige Thesis anzeigen
     public function show($id) {
         $thesis = Thesis::find($id);
@@ -42,12 +39,10 @@ class ThesisController extends Controller
         Thesis::destroy($id);
         return response(null, 204);
     }
-
     //Thesis nach Titel suchen
     public function search($title) {
         return Thesis::where('title', 'like', '%'.$title.'%')->get();
     }
-
     /* 
     public function getTheses() {
         $theses = Thesis::all();

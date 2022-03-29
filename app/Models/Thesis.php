@@ -23,9 +23,7 @@ class Thesis extends Model
         'updated_at',
         'created_at',
     ];
-
-
-    
+  
     public function tag()
     {
         return $this->hasManyThrough(
