@@ -3,10 +3,10 @@ import VueRouter from 'vue-router';
 Vue.use(VueRouter);
 
 import ThesesList from '../components/ThesesList.vue';
-//import ThesesList from "../compone"
 import ThesesListAdmin from '../components/ThesesListAdmin.vue';
 import Home from '../components/Home.vue';
 import ThesisDetail from '../components/ThesisDetail.vue';
+import TagsList from '../components/TagsList.vue';
 
 const routes = [
     {
@@ -28,6 +28,11 @@ const routes = [
         name: '/get_thesis',
         path: '/get_thesis/:id?',
         component: ThesisDetail
+    },
+    {
+        name: '/get_tag',
+        path: '/get_tag/:id?',
+        component: TagsList
     },
 ];
 
