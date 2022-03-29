@@ -9,11 +9,24 @@
     ></v-img>
 
     <v-card-title>
-     {{thesis.titel}}
+     {{getThesis(this.$route.params.id).title}}
     </v-card-title>
 
-    <v-card-subtitle>
-     {{thesis.publisher}}
+    <v-card-subtitle>   
+    {{getThesis(this.$route.params.id).publisher}}
+    </v-card-subtitle>
+
+    <v-card-subtitle>   
+     <v-chip
+        class="mr-2"
+        @click="lights"
+        color="pink"
+        >
+        <v-icon left>
+          mdi-label
+        </v-icon>
+          {{getTag(this.$route.params.tag_ids).name}}
+      </v-chip>
     </v-card-subtitle>
 
     <v-card-actions>
@@ -39,7 +52,7 @@
         <v-divider></v-divider>
 
         <v-card-text>
-           {{thesis.description}}
+           {{getThesis(this.$route.params.id).description}}
         </v-card-text>
       </div>
     </v-expand-transition>
@@ -47,28 +60,38 @@
 </template>
 
 <script>
+import { mapState , mapGetters } from 'vuex';
   export default {
     data: () => ({
       show: false,
-
-      url: document.head.querySelector('meta[name="url"]').content,
-      thesis: {},
+     /*  thesis() {
+        return theses.find(tid=>tid.id == this.$route.params.id) || {}
+      }, */
+     /*  url: document.head.querySelector('meta[name="url"]').content,
+      thesis: {}, */
 
     }),
-    created() {
-      this.loadData();
+    computed: {
+       ...mapState(['theses', 'tags']),
+       ...mapGetters(['getThesis','getTag'])
     },
+   /*  created() {
+      this.loadData();
+    }, */
     methods: {
-      loadData() {
+      lights () {
+        console.log(this.theses.tag_ids);
+      },
+     /*  loadData() {
         let url = this.url + `/api/get_thesis/${this.$route.params.id}`;
         this.axios.get(url).then(response => {
           this.thesis = response.data;
           console.log(this.thesis);
         })
         console.log(this.theses);
-      },
+      }, */
       mounted() {
-        console.log('ThesisDetail Komponente');
+        //this.$store.dispatch('loadTheses');
       },
     },
   }

@@ -338,7 +338,7 @@
           Object.assign(this.theses[this.editedIndex], this.editedItem)
         } else {
           this.theses.push(this.editedItem)
-          let url = this.url + '/api/saveTheses';
+          let url = this.url + '/api/theses';
           this.axios.post(url, this.editedItem).then(response => {
                 if(response.status) {
                     console.log(response.data);
