@@ -2,7 +2,7 @@
   <v-data-table
     :headers="headers"
     :items="theses"
-    sort-by="titel"
+    sort-by="title"
     class="elevation-1"
   >
     <template v-slot:top>
@@ -22,13 +22,16 @@
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
-              color="primary"
+              color="indigo"
               dark
-              class="mb-2"
+              class="mx-2"
+              fab
               v-bind="attrs"
               v-on="on"
             >
-              Neue Abschlussarbeit
+            <v-icon dark>
+              mdi-plus
+            </v-icon>
             </v-btn>
           </template>
           <v-card>        
@@ -41,9 +44,9 @@
                 ref="form"
                 v-model="valid"
                 lazy-validation
-            >
+             >
                 <v-text-field
-                v-model="editedItem.titel"
+                v-model="editedItem.title"
                 :counter="10"
                 :rules="textRules"
                 label="Titel"
@@ -93,36 +96,6 @@
                 label="File input"
                 ></v-file-input> 
 
-                <v-checkbox
-                v-model="checkbox"
-                :rules="[v => !!v || 'You must agree to continue!']"
-                label="Do you agree?"
-                required
-                ></v-checkbox>
-
-                <v-btn
-                :disabled="!valid"
-                color="success"
-                class="mr-4"
-                @click="validate"
-                >
-                Validate
-                </v-btn>
-
-                <v-btn
-                color="error"
-                class="mr-4"
-                @click="reset"
-                >
-                Reset Form
-                </v-btn>
-
-                <v-btn
-                color="warning"
-                @click="resetValidation"
-                >
-                Reset Validation
-                </v-btn>
             </v-form>    
             </v-card-text>
 
@@ -133,14 +106,14 @@
                 text
                 @click="close"
               >
-                Cancel
+                Abbrechen
               </v-btn>
               <v-btn
                 color="blue darken-1"
                 text
                 @click="save"
               >
-                Save
+                Speichern
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -148,17 +121,43 @@
         
       </v-toolbar>
     </template>
+    <template v-slot:item.addTags="{ item }">
+       <v-chip
+          v-for="(it, i) in item.tag_names"  
+          :key="i"
+          class="mr-2"
+          @click="$router.push({ 
+            name: '/get_tag' , params: {tag_ids:item.tag_ids} })"
+          color="pink"
+          >
+            <v-icon left>
+              mdi-label
+            </v-icon>
+              <!-- {{getTag(item.tag_ids).name}} -->
+              {{it}}
+        </v-chip>
+      </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon
-        small
-        class="mr-2"
-        @click="editItem(item)"
+      <v-btn rounded 
+        color="primary" @click="$router.push({ name: '/get_thesis', 
+            params: {id:item.id, tag_ids:item.tag_ids} })">
+        Mehr
+      </v-btn>
+      <v-btn
+       class="mx-2"
+       fab
+       dark
+       small
+       color="cyan"
       >
-        mdi-pencil
-      </v-icon>
+        <v-icon
+          @click="editItem(item)"
+        >
+          mdi-pencil
+        </v-icon>
+      </v-btn>
       <v-icon
-        small
-        @click="deleteItem(item)"
+        @click="deleteItemConf"
       >
         mdi-delete
       </v-icon>
@@ -168,25 +167,18 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+              <v-btn color="blue darken-1" text @click="deleteItem(item)">OK</v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
       </v-dialog>
 
     </template>
-    <template v-slot:no-data>
-      <v-btn
-        color="primary"
-        @click="initialize"
-      >
-        Reset
-      </v-btn>
-    </template>
   </v-data-table>
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 //import AddTheses from './AddTheses.vue'
   export default {
     data: () => ({
@@ -210,28 +202,24 @@
       dialog: false,
       dialogDelete: false,
       headers: [
-        { text: 'TITEL',align: 'titel', sortable: false, value: 'titel'},
+        { text: 'TITEL',align: 'title', sortable: false, value: 'title'},
         { text: 'HERAUSGEBER', value: 'publisher' },
         { text: 'TECHNOLOGY', value: 'proglang' },
         { text: 'FILE', value: 'image' },
+        { text: 'TAGS', value: 'addTags'},
         { text: 'ACTIONS', value: 'actions', sortable: false },
       ],
 
-      theses: [],
-      fileData: null,
-
-      url: document.head.querySelector('meta[name="url"]').content,
-
       editedIndex: -1,
       editedItem: {
-        titel: '',
+        title: '',
         publisher: '',
         proglang: '',
         image: null,
         description: '',
       },
       defaultItem: {
-        titel: '',
+        title: '',
         publisher: '',
         proglang: '',
         image: null,
@@ -240,6 +228,8 @@
     }),
 
     computed: {
+      ...mapState(['theses', 'tags']),
+      ...mapGetters(['getTag']),
       formTitle () {
         return this.editedIndex === -1 ? 'Neue Abschlussarbeit' : 'Abschlussarbeit bearbeiten'
       },
@@ -253,53 +243,32 @@
         val || this.closeDelete()
       },
     },
-
-    created () {
-      this.initialize()
-    },
-
     methods: {
-      initialize () {
-            let url = this.url + '/api/getTheses';
-            this.axios.get(url).then(response => {
-                this.theses = response.data;
-            })
+      edititemConf () {
+        this.dialog = true
       },
-
       editItem (item) {
         this.editedIndex = this.theses.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.dialog = true
-
-
-
-
-
-        
+        this.dialog = true   
+        //this.$store.dispatch('editThesis', item);
       },
-
-      deleteItem (item) {
-       
+      deleteItemConf () {
+        this.dialogDelete = true
+      },
+      deleteItem (item) {  
         this.editedIndex = this.theses.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.dialogDelete = true
+    
+        this.$store.dispatch('deleteThesis', item);
 
-       
-          let url = this.url + `/api/deleteThesis/${item.id}`;
-          this.axios.delete(url).then(response => {                   
-                  if(response.status) {
-                      console.log(response.data);
-                  } else {
-                      console.log("error");
-                  }
-              })    
+        this.closeDelete();   
       },
 
-      deleteItemConfirm () {
-        //this.initialize();
-        this.theses.splice(this.editedIndex, 1)
-        this.closeDelete()
-      },
+      /* deleteItemConfirm () {
+         this.theses.splice(this.editedIndex, 1)
+         this.closeDelete()
+      }, */
 
       close () {
         this.dialog = false
@@ -318,48 +287,26 @@
       },
 
       save () {
-
-        /* f (!this.editedItem.image) {this.fileData = "No File Chosen"}
-        var reader = new FileReader();
-      
-        // Use the javascript reader object to load the contents
-        // of the file in the v-model prop
-        
-        reader.readAsText(this.editedItem.image[0]);
-
-        reader.onload = () => {
-            
-            this.fileData = reader.result;
-        }
-
-        this.editedItem.image = this.fileData; */
-
         if (this.editedIndex > -1) {
           Object.assign(this.theses[this.editedIndex], this.editedItem)
+          // Für den Fall , das Thesis nur geändert wurde
+          this.$store.dispatch('editThesis', this.editedItem);
         } else {
-          this.theses.push(this.editedItem)
-          let url = this.url + '/api/theses';
+          //this.theses.push(this.editedItem)
+
+          this.$store.dispatch('createThesis', this.editedItem);
+
+          /* let url = this.url + '/api/theses';
           this.axios.post(url, this.editedItem).then(response => {
                 if(response.status) {
                     console.log(response.data);
                 } else {
                     console.log("error");
                 }
-            })
+            }) */
         }
         this.close()
       },
-
-      validate () {
-        this.$refs.form.validate()
-      },
-      reset () {
-        this.$refs.form.reset()
-      },
-      resetValidation () {
-        this.$refs.form.resetValidation()
-      },
-
     },
   }
 </script>
