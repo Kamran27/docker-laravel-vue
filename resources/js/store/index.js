@@ -10,11 +10,27 @@ export default new Vuex.Store({
         tags: [],
     },
     mutations: {
-        SET_THESES(state,theses) {
+        SET_THESES(state, theses) {
             state.theses = theses;
         },
-        SET_TAGS(state,tags) {
+        SET_TAGS(state, tags) {
             state.tags = tags;
+        },
+        ADD_THESES(state, thesis) {
+            let theses =  state.theses.concat(thesis);
+            state.theses = theses;
+        },
+        EDIT_THESES(state, thesis) {
+            state.theses.forEach(t=> {
+                if (t.id == thesis.id) {
+                    t = thesis;
+                    
+                }
+            })
+        },
+        DELETE_THESES(state, thesisId) {
+            let theses =  state.theses.filter(t=>t.id != thesisId);
+            state.theses = theses;
         },
     },
     actions: {
@@ -42,6 +58,26 @@ export default new Vuex.Store({
             //debugger
             //commit('SET_TAGS', tags);
             commit('SET_TAGS', tags.map(t => t.attributes));    
+        },
+        async createThesis({commit}, thesis) { 
+            let response = await Api().post('/theses', thesis);
+            let savedThesis = response.data.data.attributes;
+            //debugger
+            commit('ADD_THESES', savedThesis);
+        },
+        async editThesis({commit}, thesis) { 
+            let response = await Api().put(`/theses/${thesis.id}`, thesis);
+            debugger
+            let editedThesis = response.data.data.attributes;
+            
+            commit('EDIT_THESES', editedThesis);
+        },
+        async deleteThesis({commit}, thesis) { 
+            let response = await Api().delete(`/theses/${thesis.id}`);
+            //debugger
+            if (response.status == 200 || response.status == 204) {
+                commit('DELETE_THESES', thesis.id);
+            } 
         },
     },
     getters: {
