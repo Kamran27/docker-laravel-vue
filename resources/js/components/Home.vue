@@ -1,6 +1,6 @@
 <template>
 <div>
-     <h2>Tags</h2>
+     <!-- <h2>Tags</h2>
      <div v-for="tag in tags" :key="tag.name">
        {{tag}}
      </div>
@@ -24,7 +24,7 @@
        <div v-for="thesis_titles in tag.theses_ids" :key="thesis_titles">
         <button>{{getThesis(thesis_titles).title}}</button>
        </div>
-     </div> 
+     </div>  -->
  </div>
 </template>
 

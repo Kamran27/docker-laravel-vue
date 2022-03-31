@@ -2257,7 +2257,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "ThesesList",
+  name: "TagsList",
   data: function data() {
     return {
       expanded: [],
@@ -2378,15 +2378,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "ThesesList",
@@ -2436,9 +2427,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     mounted() {
       console.log('ThesesList Komponente');
     }, */
-    clicked: function clicked(value) {
-      this.expanded.push(value);
-    }
   }
 });
 
@@ -2455,6 +2443,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 //
 //
 //
@@ -2634,16 +2629,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//import AddTheses from './AddTheses.vue'
+ //import AddTheses from './AddTheses.vue'
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2664,9 +2651,9 @@ __webpack_require__.r(__webpack_exports__);
       dialogDelete: false,
       headers: [{
         text: 'TITEL',
-        align: 'titel',
+        align: 'title',
         sortable: false,
-        value: 'titel'
+        value: 'title'
       }, {
         text: 'HERAUSGEBER',
         value: 'publisher'
@@ -2677,23 +2664,23 @@ __webpack_require__.r(__webpack_exports__);
         text: 'FILE',
         value: 'image'
       }, {
+        text: 'TAGS',
+        value: 'addTags'
+      }, {
         text: 'ACTIONS',
         value: 'actions',
         sortable: false
       }],
-      theses: [],
-      fileData: null,
-      url: document.head.querySelector('meta[name="url"]').content,
       editedIndex: -1,
       editedItem: {
-        titel: '',
+        title: '',
         publisher: '',
         proglang: '',
         image: null,
         description: ''
       },
       defaultItem: {
-        titel: '',
+        title: '',
         publisher: '',
         proglang: '',
         image: null,
@@ -2701,11 +2688,11 @@ __webpack_require__.r(__webpack_exports__);
       }
     };
   },
-  computed: {
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapState)(['theses', 'tags'])), (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(['getTag'])), {}, {
     formTitle: function formTitle() {
       return this.editedIndex === -1 ? 'Neue Abschlussarbeit' : 'Abschlussarbeit bearbeiten';
     }
-  },
+  }),
   watch: {
     dialog: function dialog(val) {
       val || this.close();
@@ -2714,95 +2701,65 @@ __webpack_require__.r(__webpack_exports__);
       val || this.closeDelete();
     }
   },
-  created: function created() {
-    this.initialize();
-  },
   methods: {
-    initialize: function initialize() {
-      var _this = this;
-
-      var url = this.url + '/api/getTheses';
-      this.axios.get(url).then(function (response) {
-        _this.theses = response.data;
-      });
+    edititemConf: function edititemConf() {
+      this.dialog = true;
     },
     editItem: function editItem(item) {
       this.editedIndex = this.theses.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      this.dialog = true;
+      this.dialog = true; //this.$store.dispatch('editThesis', item);
+    },
+    deleteItemConf: function deleteItemConf() {
+      this.dialogDelete = true;
     },
     deleteItem: function deleteItem(item) {
       this.editedIndex = this.theses.indexOf(item);
       this.editedItem = Object.assign({}, item);
-      this.dialogDelete = true;
-      var url = this.url + "/api/deleteThesis/".concat(item.id);
-      this.axios["delete"](url).then(function (response) {
-        if (response.status) {
-          console.log(response.data);
-        } else {
-          console.log("error");
-        }
-      });
-    },
-    deleteItemConfirm: function deleteItemConfirm() {
-      //this.initialize();
-      this.theses.splice(this.editedIndex, 1);
+      this.$store.dispatch('deleteThesis', item);
       this.closeDelete();
     },
+
+    /* deleteItemConfirm () {
+       this.theses.splice(this.editedIndex, 1)
+       this.closeDelete()
+    }, */
     close: function close() {
-      var _this2 = this;
+      var _this = this;
 
       this.dialog = false;
+      this.$nextTick(function () {
+        _this.editedItem = Object.assign({}, _this.defaultItem);
+        _this.editedIndex = -1;
+      });
+    },
+    closeDelete: function closeDelete() {
+      var _this2 = this;
+
+      this.dialogDelete = false;
       this.$nextTick(function () {
         _this2.editedItem = Object.assign({}, _this2.defaultItem);
         _this2.editedIndex = -1;
       });
     },
-    closeDelete: function closeDelete() {
-      var _this3 = this;
-
-      this.dialogDelete = false;
-      this.$nextTick(function () {
-        _this3.editedItem = Object.assign({}, _this3.defaultItem);
-        _this3.editedIndex = -1;
-      });
-    },
     save: function save() {
-      /* f (!this.editedItem.image) {this.fileData = "No File Chosen"}
-      var reader = new FileReader();
-             // Use the javascript reader object to load the contents
-      // of the file in the v-model prop
-      
-      reader.readAsText(this.editedItem.image[0]);
-       reader.onload = () => {
-          
-          this.fileData = reader.result;
-      }
-       this.editedItem.image = this.fileData; */
       if (this.editedIndex > -1) {
         Object.assign(this.theses[this.editedIndex], this.editedItem);
+        this.$store.dispatch('editThesis', this.editedItem);
       } else {
-        this.theses.push(this.editedItem);
-        var url = this.url + '/api/theses';
-        this.axios.post(url, this.editedItem).then(function (response) {
-          if (response.status) {
-            console.log(response.data);
-          } else {
-            console.log("error");
-          }
-        });
+        //this.theses.push(this.editedItem)
+        this.$store.dispatch('createThesis', this.editedItem);
+        /* let url = this.url + '/api/theses';
+        this.axios.post(url, this.editedItem).then(response => {
+              if(response.status) {
+                  console.log(response.data);
+              } else {
+                  console.log("error");
+              }
+          }) */
       }
 
       this.close();
-    },
-    validate: function validate() {
-      this.$refs.form.validate();
-    },
-    reset: function reset() {
-      this.$refs.form.reset();
-    },
-    resetValidation: function resetValidation() {
-      this.$refs.form.resetValidation();
     }
   }
 });
@@ -3140,6 +3097,23 @@ vue__WEBPACK_IMPORTED_MODULE_2__["default"].use(vuex__WEBPACK_IMPORTED_MODULE_3_
     },
     SET_TAGS: function SET_TAGS(state, tags) {
       state.tags = tags;
+    },
+    ADD_THESES: function ADD_THESES(state, thesis) {
+      var theses = state.theses.concat(thesis);
+      state.theses = theses;
+    },
+    EDIT_THESES: function EDIT_THESES(state, thesis) {
+      state.theses.forEach(function (t) {
+        if (t.id == thesis.id) {
+          t = thesis;
+        }
+      });
+    },
+    DELETE_THESES: function DELETE_THESES(state, thesisId) {
+      var theses = state.theses.filter(function (t) {
+        return t.id != thesisId;
+      });
+      state.theses = theses;
     }
   },
   actions: {
@@ -3216,6 +3190,83 @@ vue__WEBPACK_IMPORTED_MODULE_2__["default"].use(vuex__WEBPACK_IMPORTED_MODULE_3_
             }
           }
         }, _callee2);
+      }))();
+    },
+    createThesis: function createThesis(_ref3, thesis) {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+        var commit, response, savedThesis;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                commit = _ref3.commit;
+                _context3.next = 3;
+                return (0,_services_api__WEBPACK_IMPORTED_MODULE_1__["default"])().post('/theses', thesis);
+
+              case 3:
+                response = _context3.sent;
+                savedThesis = response.data.data.attributes; //debugger
+
+                commit('ADD_THESES', savedThesis);
+
+              case 6:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
+    },
+    editThesis: function editThesis(_ref4, thesis) {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
+        var commit, response, editedThesis;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                commit = _ref4.commit;
+                _context4.next = 3;
+                return (0,_services_api__WEBPACK_IMPORTED_MODULE_1__["default"])().put("/theses/".concat(thesis.id), thesis);
+
+              case 3:
+                response = _context4.sent;
+                debugger;
+                editedThesis = response.data.data.attributes;
+                commit('EDIT_THESES', editedThesis);
+
+              case 7:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
+    },
+    deleteThesis: function deleteThesis(_ref5, thesis) {
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
+        var commit, response;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                commit = _ref5.commit;
+                _context5.next = 3;
+                return (0,_services_api__WEBPACK_IMPORTED_MODULE_1__["default"])()["delete"]("/theses/".concat(thesis.id));
+
+              case 3:
+                response = _context5.sent;
+
+                //debugger
+                if (response.status == 200 || response.status == 204) {
+                  commit('DELETE_THESES', thesis.id);
+                }
+
+              case 5:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5);
       }))();
     }
   },
@@ -22348,67 +22399,7 @@ var render = function () {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    [
-      _c("h2", [_vm._v("Tags")]),
-      _vm._v(" "),
-      _vm._l(_vm.tags, function (tag) {
-        return _c("div", { key: tag.name }, [
-          _vm._v("\n       " + _vm._s(tag) + "\n     "),
-        ])
-      }),
-      _vm._v(" "),
-      _c("h2", [_vm._v("Abschlussarbeiten")]),
-      _vm._v(" "),
-      _vm._l(_vm.theses, function (thesis) {
-        return _c("div", { key: thesis.title }, [
-          _vm._v("\n       " + _vm._s(thesis) + "\n     "),
-        ])
-      }),
-      _vm._v(" "),
-      _c("h2", [_vm._v("Abschlussarbeiten mit Tags")]),
-      _vm._v(" "),
-      _vm._l(_vm.theses, function (thesis) {
-        return _c(
-          "div",
-          { key: thesis.title },
-          [
-            _c("h4", [_vm._v(_vm._s(thesis.title))]),
-            _vm._v(" "),
-            _vm._l(thesis.tag_ids, function (tag_id) {
-              return _c("div", { key: tag_id }, [
-                _c("button", [_vm._v(_vm._s(_vm.getTag(tag_id).name))]),
-              ])
-            }),
-          ],
-          2
-        )
-      }),
-      _vm._v(" "),
-      _c("h2", [_vm._v("Tags mit Abschlussarbeiten")]),
-      _vm._v(" "),
-      _vm._l(_vm.tags, function (tag) {
-        return _c(
-          "div",
-          { key: tag.name },
-          [
-            _c("h4", [_vm._v(_vm._s(tag.name))]),
-            _vm._v(" "),
-            _vm._l(tag.theses_ids, function (thesis_titles) {
-              return _c("div", { key: thesis_titles }, [
-                _c("button", [
-                  _vm._v(_vm._s(_vm.getThesis(thesis_titles).title)),
-                ]),
-              ])
-            }),
-          ],
-          2
-        )
-      }),
-    ],
-    2
-  )
+  return _c("div")
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -22638,23 +22629,7 @@ var render = function () {
                 _c(
                   "v-toolbar",
                   { attrs: { flat: "" } },
-                  [
-                    _c("v-toolbar-title", [_vm._v("Abschlussarbeiten")]),
-                    _vm._v(" "),
-                    _c("v-spacer"),
-                    _vm._v(" "),
-                    _c("v-switch", {
-                      staticClass: "mt-2",
-                      attrs: { label: "Single expand" },
-                      model: {
-                        value: _vm.singleExpand,
-                        callback: function ($$v) {
-                          _vm.singleExpand = $$v
-                        },
-                        expression: "singleExpand",
-                      },
-                    }),
-                  ],
+                  [_c("v-toolbar-title", [_vm._v("Abschlussarbeiten")])],
                   1
                 ),
               ]
@@ -22701,7 +22676,7 @@ var render = function () {
                 _c(
                   "v-btn",
                   {
-                    attrs: { depressed: "", color: "primary" },
+                    attrs: { rounded: "", color: "primary" },
                     on: {
                       click: function ($event) {
                         return _vm.$router.push({
@@ -22747,7 +22722,7 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c("v-data-table", {
     staticClass: "elevation-1",
-    attrs: { headers: _vm.headers, items: _vm.theses, "sort-by": "titel" },
+    attrs: { headers: _vm.headers, items: _vm.theses, "sort-by": "title" },
     scopedSlots: _vm._u([
       {
         key: "top",
@@ -22782,8 +22757,12 @@ var render = function () {
                               _vm._g(
                                 _vm._b(
                                   {
-                                    staticClass: "mb-2",
-                                    attrs: { color: "primary", dark: "" },
+                                    staticClass: "mx-2",
+                                    attrs: {
+                                      color: "indigo",
+                                      dark: "",
+                                      fab: "",
+                                    },
                                   },
                                   "v-btn",
                                   attrs,
@@ -22792,10 +22771,11 @@ var render = function () {
                                 on
                               ),
                               [
-                                _vm._v(
-                                  "\n            Neue Abschlussarbeit\n          "
-                                ),
-                              ]
+                                _c("v-icon", { attrs: { dark: "" } }, [
+                                  _vm._v("\n            mdi-plus\n          "),
+                                ]),
+                              ],
+                              1
                             ),
                           ]
                         },
@@ -22845,11 +22825,11 @@ var render = function () {
                                     required: "",
                                   },
                                   model: {
-                                    value: _vm.editedItem.titel,
+                                    value: _vm.editedItem.title,
                                     callback: function ($$v) {
-                                      _vm.$set(_vm.editedItem, "titel", $$v)
+                                      _vm.$set(_vm.editedItem, "title", $$v)
                                     },
-                                    expression: "editedItem.titel",
+                                    expression: "editedItem.title",
                                   },
                                 }),
                                 _vm._v(" "),
@@ -22943,71 +22923,6 @@ var render = function () {
                                     expression: "editedItem.image",
                                   },
                                 }),
-                                _vm._v(" "),
-                                _c("v-checkbox", {
-                                  attrs: {
-                                    rules: [
-                                      function (v) {
-                                        return (
-                                          !!v || "You must agree to continue!"
-                                        )
-                                      },
-                                    ],
-                                    label: "Do you agree?",
-                                    required: "",
-                                  },
-                                  model: {
-                                    value: _vm.checkbox,
-                                    callback: function ($$v) {
-                                      _vm.checkbox = $$v
-                                    },
-                                    expression: "checkbox",
-                                  },
-                                }),
-                                _vm._v(" "),
-                                _c(
-                                  "v-btn",
-                                  {
-                                    staticClass: "mr-4",
-                                    attrs: {
-                                      disabled: !_vm.valid,
-                                      color: "success",
-                                    },
-                                    on: { click: _vm.validate },
-                                  },
-                                  [
-                                    _vm._v(
-                                      "\n              Validate\n              "
-                                    ),
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "v-btn",
-                                  {
-                                    staticClass: "mr-4",
-                                    attrs: { color: "error" },
-                                    on: { click: _vm.reset },
-                                  },
-                                  [
-                                    _vm._v(
-                                      "\n              Reset Form\n              "
-                                    ),
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "v-btn",
-                                  {
-                                    attrs: { color: "warning" },
-                                    on: { click: _vm.resetValidation },
-                                  },
-                                  [
-                                    _vm._v(
-                                      "\n              Reset Validation\n              "
-                                    ),
-                                  ]
-                                ),
                               ],
                               1
                             ),
@@ -23026,7 +22941,11 @@ var render = function () {
                                 attrs: { color: "blue darken-1", text: "" },
                                 on: { click: _vm.close },
                               },
-                              [_vm._v("\n              Cancel\n            ")]
+                              [
+                                _vm._v(
+                                  "\n              Abbrechen\n            "
+                                ),
+                              ]
                             ),
                             _vm._v(" "),
                             _c(
@@ -23035,7 +22954,11 @@ var render = function () {
                                 attrs: { color: "blue darken-1", text: "" },
                                 on: { click: _vm.save },
                               },
-                              [_vm._v("\n              Save\n            ")]
+                              [
+                                _vm._v(
+                                  "\n              Speichern\n            "
+                                ),
+                              ]
                             ),
                           ],
                           1
@@ -23054,36 +22977,83 @@ var render = function () {
         proxy: true,
       },
       {
+        key: "item.addTags",
+        fn: function (ref) {
+          var item = ref.item
+          return _vm._l(item.tag_names, function (it, i) {
+            return _c(
+              "v-chip",
+              {
+                key: i,
+                staticClass: "mr-2",
+                attrs: { color: "pink" },
+                on: {
+                  click: function ($event) {
+                    return _vm.$router.push({
+                      name: "/get_tag",
+                      params: { tag_ids: item.tag_ids },
+                    })
+                  },
+                },
+              },
+              [
+                _c("v-icon", { attrs: { left: "" } }, [
+                  _vm._v("\n            mdi-label\n          "),
+                ]),
+                _vm._v(" "),
+                _vm._v("\n            " + _vm._s(it) + "\n      "),
+              ],
+              1
+            )
+          })
+        },
+      },
+      {
         key: "item.actions",
         fn: function (ref) {
           var item = ref.item
           return [
             _c(
-              "v-icon",
+              "v-btn",
               {
-                staticClass: "mr-2",
-                attrs: { small: "" },
+                attrs: { rounded: "", color: "primary" },
                 on: {
                   click: function ($event) {
-                    return _vm.editItem(item)
+                    return _vm.$router.push({
+                      name: "/get_thesis",
+                      params: { id: item.id, tag_ids: item.tag_ids },
+                    })
                   },
                 },
               },
-              [_vm._v("\n      mdi-pencil\n    ")]
+              [_vm._v("\n      Mehr\n    ")]
             ),
             _vm._v(" "),
             _c(
-              "v-icon",
+              "v-btn",
               {
-                attrs: { small: "" },
-                on: {
-                  click: function ($event) {
-                    return _vm.deleteItem(item)
-                  },
-                },
+                staticClass: "mx-2",
+                attrs: { fab: "", dark: "", small: "", color: "cyan" },
               },
-              [_vm._v("\n      mdi-delete\n    ")]
+              [
+                _c(
+                  "v-icon",
+                  {
+                    on: {
+                      click: function ($event) {
+                        return _vm.editItem(item)
+                      },
+                    },
+                  },
+                  [_vm._v("\n        mdi-pencil\n      ")]
+                ),
+              ],
+              1
             ),
+            _vm._v(" "),
+            _c("v-icon", { on: { click: _vm.deleteItemConf } }, [
+              _vm._v("\n      mdi-delete\n    "),
+            ]),
             _vm._v(" "),
             _c(
               "v-dialog",
@@ -23123,7 +23093,11 @@ var render = function () {
                           "v-btn",
                           {
                             attrs: { color: "blue darken-1", text: "" },
-                            on: { click: _vm.deleteItemConfirm },
+                            on: {
+                              click: function ($event) {
+                                return _vm.deleteItem(item)
+                              },
+                            },
                           },
                           [_vm._v("OK")]
                         ),
@@ -23140,19 +23114,6 @@ var render = function () {
             ),
           ]
         },
-      },
-      {
-        key: "no-data",
-        fn: function () {
-          return [
-            _c(
-              "v-btn",
-              { attrs: { color: "primary" }, on: { click: _vm.initialize } },
-              [_vm._v("\n      Reset\n    ")]
-            ),
-          ]
-        },
-        proxy: true,
       },
     ]),
   })
@@ -23182,7 +23143,7 @@ var render = function () {
   var _c = _vm._self._c || _h
   return _c(
     "v-card",
-    { staticClass: "mx-auto", attrs: { "max-width": "344" } },
+    { staticClass: "mx-auto", attrs: { "max-width": "1000" } },
     [
       _c("v-img", {
         attrs: {
