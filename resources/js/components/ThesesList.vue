@@ -20,16 +20,9 @@
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Abschlussarbeiten</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-switch
-            v-model="singleExpand"
-            label="Single expand"
-            class="mt-2"
-          ></v-switch>
         </v-toolbar>
       </template>
       <template v-slot:item.addTags="{ item }">
-
 
         <v-chip
           v-for="(it, i) in item.tag_names"  
@@ -46,11 +39,9 @@
               {{it}}
         </v-chip>
 
-
-
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-btn depressed 
+        <v-btn rounded 
         color="primary" @click="$router.push({ name: '/get_thesis', 
             params: {id:item.id, tag_ids:item.tag_ids} })">
         Mehr
@@ -75,7 +66,7 @@ import { mapState, mapGetters } from 'vuex';
           { text: 'TITEL', value: 'title' },
           { text: 'HERAUSGEBER', value: 'publisher' },
           { text: 'TECHNOLOGIE', value: 'proglang' },
-          {text: 'TAGS', value: 'addTags'},
+          { text: 'TAGS', value: 'addTags'},
           { text: 'DETAIL', value: 'actions', sortable: false },
         ],  
       }
@@ -104,9 +95,6 @@ import { mapState, mapGetters } from 'vuex';
       mounted() {
         console.log('ThesesList Komponente');
       }, */
-      clicked(value) {
-        this.expanded.push(value)      
-      },
     },
 
   }

@@ -62,7 +62,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
   export default {
-    name: "ThesesList",
+    name: "TagsList",
      data () {
       return {
         expanded: [],
