@@ -28,11 +28,19 @@ Route::get('/theses/search/{titel}', [ThesisController::class, 'search']);
 Route::get('/tags', [TagsController::class, 'index']);
 Route::get('/tags/{id}', [TagsController::class, 'show']);
 
+
+/////////////////////// Protected routes auskommentiert um zu testen
+Route::post('/theses', [ThesisController::class, 'store']);
+Route::delete('/theses/{id}', [ThesisController::class, 'destroy']);
+Route::put('/theses/{id}', [ThesisController::class, 'update']);
+/////////////////////////////////
+
+
 //Protected routes
 Route::group(['middleware' => ['auth:sanctum']], function() {
-    Route::post('/theses', [ThesisController::class, 'store']);
-    Route::put('/theses/{id}', [ThesisController::class, 'update']);
-    Route::delete('/theses/{id}', [ThesisController::class, 'destroy']); 
+    //Route::post('/theses', [ThesisController::class, 'store']);
+    //Route::put('/theses/{id}', [ThesisController::class, 'update']);
+    //Route::delete('/theses/{id}', [ThesisController::class, 'destroy']); 
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::post('/tags', [TagsController::class, 'store']);
