@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -13,13 +14,16 @@ class AuthController extends Controller
         $fields = $request->validate([
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
-            'password' => 'required|string|confirmed'
+            'password' => 'required|string|confirmed',
+            //'password_confirmation' => 'required|string|confirmed',
         ]);
 
         $user = User::create([
             'name' => $fields['name'],
             'email' => $fields['email'],
-            'password' => bcrypt($fields['password'])
+            'password' => bcrypt($fields['password']),
+            'admin' => null,
+            
         ]);
 
         $token = $user->createToken('myapptoken')->plainTextToken;
@@ -27,9 +31,11 @@ class AuthController extends Controller
         $response = [
             'user' => $user,
             'token' => $token
-        ];
+        ]; 
 
-        return response($response, 201);
+        //return response($response, 201);
+        return $response;
+        //return new UserResource($response);
     }
 
     public function login(Request $request) {
@@ -55,7 +61,7 @@ class AuthController extends Controller
             'token' => $token
         ];
 
-        return response($response, 201);
+        return response($response);
     }
 
     public function logout(Request $request) {
