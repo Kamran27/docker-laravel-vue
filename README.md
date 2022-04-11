@@ -9,15 +9,16 @@
 
 # About this Web App
 
--Backend with Laravel Sail 
--Frontend Vue.js
--Running on Docker
+- Backend with Laravel Sail 
+- Frontend Vue.js
+- Running on Docker
+- docker-compose.yml file has Information about phpmayadmin and sql post and more
 
 # How to Start
 
--Start Docker
--Run: ./vendor/bin/sail up
--For developing: ./vendor/bin/sail npm run dev
+- Start Docker
+- Run: ./vendor/bin/sail up
+- For developing: ./vendor/bin/sail npm run dev
 
 ## About Laravel
 
