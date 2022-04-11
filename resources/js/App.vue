@@ -25,30 +25,40 @@
                 <v-btn to="/registration" text>
                 <span class="mr-2">Registrieren</span>
             </v-btn>
-            </div>
+            </div>    
         </v-app-bar>
         <v-main>
             <v-container>
                 <router-view />
+                <v-snackbar
+                    v-for="snackbar in snackbars"
+                    :key="snackbar.text + Math.random()"
+                    v-model="snackbar.showing"
+                    :timeout="3000"
+                    color="snackbar.color"
+                >
+                    {{snackbar.text}}
+                    <v-btn text @click="snackbar.showing = false">
+                    Schließen
+                    </v-btn>
+                </v-snackbar>
             </v-container>
         </v-main>
     </v-app>
-  
 </template> 
-
 <!-- App.vue -->
-
 <script>
 import { mapState } from 'vuex';
 export default {
   name: 'app',  
   mounted() {
       this.$store.dispatch('loadTheses');
-      this.$store.dispatch('loadUsers');
+      this.$store.dispatch('loadTheses');
+      this.$store.dispatch('loadTags');
       this.$store.dispatch('loadCurrentUser');
   },
   computed: {
-        ...mapState(['users','currentUser'])
+        ...mapState(['users','currentUser', 'snackbars','token'])
    },
    methods: {
        logoutUser() {

@@ -25,7 +25,8 @@
         <v-icon left>
           mdi-label
         </v-icon>
-          {{getTag(this.$route.params.tag_ids).name}}
+          <!-- {{getTag(this.$route.params.tag_ids).name}} -->
+          {{getTag(this.$route.params.tag_ids)}}
       </v-chip>
     </v-card-subtitle>
 

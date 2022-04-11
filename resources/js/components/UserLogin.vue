@@ -23,6 +23,7 @@
 
 <script>
 import validations from "../utils/validations";
+import { mapState } from 'vuex';
 export default {
   name: 'UserLogin',  
     data() {
@@ -36,13 +37,25 @@ export default {
             ...validations,
         }
     },
+    computed: {
+        ...mapState(['snackbar','token'])
+    },
     methods: {
         async loginUser() {
             let user = await this.$store.dispatch('loginUser', this.loginInfo);
             if (user.error) {
-                alert(user.error)
+                this.$store.dispatch('setSnackbar', {
+                color: 'red accent-2',
+                text: `${user.error} Nicht angemeldet.` });
             } else {
-                alert('Danke für die Anmeldung, ' + user.name)
+                this.$store.dispatch('setSnackbar', {
+                text: ` ${user.name} erfolgreich angemeldet.` });
+                //alert('Danke für die Anmeldung, ' + user.name)
+                if(user.admin) {
+                    this.$router.push('admin/theses');
+                } else {
+                    this.$router.push('/');
+                }
             }
         },
     },

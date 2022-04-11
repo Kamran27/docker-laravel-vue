@@ -1,4 +1,5 @@
 <template>
+<v-container>
  <v-card>
    <v-card-title>
       <v-spacer></v-spacer>
@@ -49,6 +50,7 @@
       </template>
   </v-data-table> 
  </v-card>
+ </v-container>
 </template>
 
 <script>

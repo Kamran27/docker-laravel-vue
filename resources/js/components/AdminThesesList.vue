@@ -47,71 +47,69 @@
               </v-btn>
             </template>
             <v-card>        
-            <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
+              <v-card-title>
+                  <span class="text-h5">{{ formTitle }}</span>
               </v-card-title>
               <v-card-text>
+                <v-form
+                    ref="form"
+                    v-model="valid"
+                    lazy-validation
+                >
+                    <v-text-field
+                    v-model="editedItem.title"
+                    :counter="10"
+                    :rules="[required('title'), minLength('title', 5), maxLength('title', 50)]"
+                    label="Titel"
+                    required
+                    ></v-text-field>
 
-              <v-form
-                  ref="form"
-                  v-model="valid"
-                  lazy-validation
-              >
-                  <v-text-field
-                  v-model="editedItem.title"
-                  :counter="10"
-                  :rules="[required('title'), minLength('title', 5), maxLength('title', 50)]"
-                  label="Titel"
-                  required
-                  ></v-text-field>
+                    <v-text-field
+                    v-model="editedItem.publisher"
+                    :rules="[required('publisher'), minLength('publisher', 5), maxLength('publisher', 50)]"
+                    label="Herausgeber"
+                    required
+                    ></v-text-field>
 
-                  <v-text-field
-                  v-model="editedItem.publisher"
-                  :rules="[required('publisher'), minLength('publisher', 5), maxLength('publisher', 50)]"
-                  label="Herausgeber"
-                  required
-                  ></v-text-field>
+                    <v-text-field
+                    v-model="editedItem.proglang"
+                    :rules="[required('proglang'), minLength('proglang', 1), maxLength('proglang', 50)]"
+                    label="Technologie"
+                    required
+                    ></v-text-field>
 
-                  <v-text-field
-                  v-model="editedItem.proglang"
-                  :rules="[required('proglang'), minLength('proglang', 1), maxLength('proglang', 50)]"
-                  label="Technologie"
-                  required
-                  ></v-text-field>
+                    <v-autocomplete
+                    v-model="thesisTags"
+                    :items="tags"
+                    item-text="name"
+                    :rules="[v => !!v || 'Tag is required']"
+                    label="Tags"
+                    required
+                    chips
+                    multiple
+                    solo
+                    ></v-autocomplete>
+                    
+                    <v-textarea
+                      v-model="editedItem.description"
+                      :rules="[required('description'), minLength('description', 1), maxLength('description', 50)]"
+                      clearable
+                      clear-icon="mdi-close-circle"
+                      label="Beschreibung"
+                      value=""
+                    ></v-textarea>
 
-                  <v-select
-                  v-model="select"
-                  :items="items"
-                  :rules="[v => !!v || 'Item is required']"
-                  label="Studiengang"
-                  required
-                  chips
-                  multiple
-                  solo
-                  ></v-select>
-
-                  <v-textarea
-                    v-model="editedItem.description"
-                    :rules="[required('description'), minLength('description', 1), maxLength('description', 50)]"
-                    clearable
-                    clear-icon="mdi-close-circle"
-                    label="Beschreibung"
-                    value=""
-                  ></v-textarea>
-
-                  <v-file-input
-                  v-model="editedItem.image"
-                  accept="image/*"
-                  show-size
-                  counter
-                  chips
-                  multiple
-                  label="File input"
-                  ></v-file-input> 
-
-              </v-form>    
+                    <v-file-input
+                    v-model="editedItem.image"
+                    accept="image/*"
+                    show-size
+                    counter
+                    chips
+                    multiple
+                    label="File input"
+                    ></v-file-input> 
+                </v-form>    
               </v-card-text>
-
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
@@ -131,8 +129,7 @@
                 </v-btn>
               </v-card-actions>
             </v-card>
-          </v-dialog>
-          
+          </v-dialog>    
         </v-toolbar>
       </template>
       <template v-slot:item.addTags="{ item }">
@@ -188,7 +185,7 @@
         </v-dialog>
 
       </template>
-    </v-data-table>
+    </v-data-table>  
   </v-card>
 </template>
 
@@ -200,14 +197,9 @@ import validations from "../utils/validations";
     data: () => ({
       valid: false,
       ...validations,
-      select: null,
+      //select: null,
       search: '',
-      items: [
-        'Informatik',
-        'Wirtschaftsinformatik',
-        'Medieninformatik',
-        'Verwaltungsinformatik',
-      ],
+      //items: [],
       checkbox: false,
       dialog: false,
       dialogDelete: false,
@@ -219,7 +211,6 @@ import validations from "../utils/validations";
         { text: 'TAGS', value: 'addTags'},
         { text: 'ACTIONS', value: 'actions', sortable: false },
       ],
-
       editedIndex: -1,
       editedItem: {
         title: '',
@@ -237,8 +228,11 @@ import validations from "../utils/validations";
       },
     }),
     computed: {
-      ...mapState(['theses', 'tags']),
+      ...mapState(['theses', 'tags', 'snackbar']),
       ...mapGetters(['getTag']),
+      thesisTags () {
+        this.theses.tag_ids.map(id => this.getTag(id));
+      },
       formTitle () {
         return this.editedIndex === -1 ? 'Neue Abschlussarbeit' : 'Abschlussarbeit bearbeiten'
       },
@@ -269,15 +263,13 @@ import validations from "../utils/validations";
         this.editedItem = Object.assign({}, item)
     
         this.$store.dispatch('deleteThesis', item);
-
+        this.$store.dispatch('setSnackbar',{text: `${item.title} erfolgreich gelöscht.` });
         this.closeDelete();   
       },
-
       /* deleteItemConfirm () {
          this.theses.splice(this.editedIndex, 1)
          this.closeDelete()
       }, */
-
       close () {
         this.dialog = false
         this.$nextTick(() => {
@@ -285,7 +277,6 @@ import validations from "../utils/validations";
           this.editedIndex = -1
         })
       },
-
       closeDelete () {
         this.dialogDelete = false
         this.$nextTick(() => {
@@ -293,17 +284,19 @@ import validations from "../utils/validations";
           this.editedIndex = -1
         })
       },
-
-      save () {
+       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.theses[this.editedIndex], this.editedItem)
           // Für den Fall , das Thesis nur geändert wurde
           this.$store.dispatch('editThesis', this.editedItem);
+          this.$store.dispatch('setSnackbar', {
+            color: 'success',text: `Abschlussarbeit ${this.editedItem.title} geändert.`
+          });
         } else {
+          // Neue Thesis hinzufügen
           //this.theses.push(this.editedItem)
-
           this.$store.dispatch('createThesis', this.editedItem);
-
+          this.$store.dispatch('setSnackbar', {text: `Abschlussarbeit ${this.editedItem.title} hinzugefügt.`});
           /* let url = this.url + '/api/theses';
           this.axios.post(url, this.editedItem).then(response => {
                 if(response.status) {

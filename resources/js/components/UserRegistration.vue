@@ -34,6 +34,7 @@
 
 <script>
 import validations from "../utils/validations";
+import { mapState } from 'vuex';
 export default {
   name: 'UserRegistration',  
     data() {
@@ -49,13 +50,21 @@ export default {
             ...validations,
         }
     },
+    computed: {
+        ...mapState(['snackbar'])
+    },
     methods: {
         async registerUser() {
             let user = await this.$store.dispatch('registerUser', this.registerInfo);
             if (user.error) {
-                alert(user.error)
+                this.$store.dispatch('setSnackbar', {
+                 text: `${user.error} erfolgreich registriert.` , color: 'error'});
+                //alert(user.error)
             } else {
-                alert('Willkomen in unseren WebApp!, ' + user.name)
+                this.$store.dispatch('setSnackbar', {
+                text: `${user.name} erfolgreich registriert.`});
+                //alert('Willkomen in unseren WebApp!, ' + user.name)
+                this.$router.push('/');
             }
         },
     },

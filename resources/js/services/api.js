@@ -8,7 +8,7 @@ export default () => {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      //Authorization: currentUser && currentUser.token
+      //Authorization: currentUser && currenUser.token
     }
   });
 } 

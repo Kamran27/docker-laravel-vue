@@ -10,6 +10,8 @@ export default new Vuex.Store({
         tags: [],
         users: [],
         currentUser: {},
+        token: {},
+        snackbars: [],
     },
     mutations: {
         SET_THESES(state, theses) {
@@ -44,6 +46,12 @@ export default new Vuex.Store({
             state.currentUser = user;
             window.localStorage.currentUser = JSON.stringify(user);
         },
+        SET_TOKEN(state, token) {
+            state.token = token;
+        },
+        SET_SNACKBAR(state, snackbar) {
+            state.snackbars = state.snackbars.concat(snackbar);
+        }
     },
     actions: {
         async loadTheses({commit}) {
@@ -116,23 +124,22 @@ export default new Vuex.Store({
                 let response = await Api().post('/login', loginInfo);
                 //debugger
                 let user = response.data.user;
-                
+                let token = response.data.token;
+
                 commit('SET_CURRENT_USER', user);
+                commit('SET_TOKEN', token);
                 return user;
              } catch {
                  return {error: 
                     "Email/password Kombination war leider falsch. Bitte, versuchen Sie nochmal."}
-             }
-             
+             }    
         },
         async registerUser({commit}, registerInfo) {
             try {
                let response = await Api().post('/register', registerInfo);
-               let user = response.data.user;
-               debugger
+               let user = response.data.user;          
                //let ustok = response.data;
-               //let token = response.data.token;
-               
+               //let token = response.data.token;             
               /*  ustok.forEach(u=> {
                      u.user.token = u.token;
                }); */   
@@ -142,8 +149,12 @@ export default new Vuex.Store({
                return user;
             } catch {
                 return {error: "Es gab einen Fehler. Bitte versuchen Sie nochmal"}
-            }
-            
+            }       
+        },
+       setSnackbar({commit}, snackbar) {
+          snackbar.color = 'success';
+          snackbar.showing = true;
+          commit('SET_SNACKBAR', snackbar);
        },
     },
     getters: {

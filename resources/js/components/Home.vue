@@ -1,5 +1,6 @@
 <template>
 <div>
+  <h1>Willkomen</h1>
      <!-- <h2>Tags</h2>
      <div v-for="tag in tags" :key="tag.name">
        {{tag}}
@@ -31,7 +32,7 @@
 <script>
 import { mapState , mapGetters } from 'vuex';
 export default {
-  name: "Home",
+  /* name: "Home",
   components: {},
   computed: {
       //tags() {return this.$store.state.tags}
@@ -49,6 +50,6 @@ export default {
       clicked(value) {
         this.expanded.push(value)      
       },
-    },
+    }, */
 };
 </script>
