@@ -16,8 +16,7 @@
 
 # How to Start
 
-- Start Docker
-- Run: ./vendor/bin/sail up
+- Start Docker, run: ./vendor/bin/sail up
 - For developing: ./vendor/bin/sail npm run dev
 
 ## About Laravel
